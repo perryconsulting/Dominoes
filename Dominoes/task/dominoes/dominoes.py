@@ -106,143 +106,161 @@ class DominoSet:
             valid_deal = True
 
 
-def build_player_list(domino_set):
-    """
-    Calculate the starting player based on set size after the snake is started.
-
-    :param domino_set:
-    :return player list:
-    """
-    players: list[str] = []
-    if len(domino_set.player_set) > len(domino_set.computer_set):
-        players.append("human")
-        players.append("computer")
-    else:
-        players.append("computer")
-        players.append("human")
-    return players
-
-
-def display_current_playing_field():
-    stock_count = len(bones.stock_set)
-    computer_count = len(bones.computer_set)
-    print('=' * 70)
-    print(f"Stock size: {stock_count}")
-    print(f"Computer pieces: {computer_count}\n")
-
-    if len(bones.snake) > 6:
-        print(bones.snake[0], end='')
-        print(bones.snake[1], end='')
-        print(bones.snake[2], end='...')
-        print(bones.snake[-3], end='')
-        print(bones.snake[-2], end='')
-        print(bones.snake[-1], end='')
-    else:
-        for tile in bones.snake:
-            print(tile, end='')
-    print("\n\nYour pieces:")
-    for i, piece in enumerate(bones.player_set):
-        print(f'{i + 1}:{piece}')
-
-
-def check_game_status(player):
-    game_status = {'player_turn': "It's your turn to make a move. Enter your command.",
-                   'computer_turn': "Computer is about to make a move. Press Enter to continue...",
-                   'player_won': "The game is over. You won!",
-                   'computer_won': "The game is over. The computer won!",
-                   'draw_game': "The game is over. It's a draw!"}
-
-    if player == 'human':
-        current_status = game_status['player_turn']
-        return_status = 111
-    else:
-        current_status = game_status['computer_turn']
-        return_status = 222
-
-    if player == 'human' and len(bones.computer_set) == 0:
-        current_status = game_status['computer_won']
-        return_status = 999
-    elif player == 'computer' and len(bones.player_set) == 0:
-        current_status = game_status['player_won']
-        return_status = 999
-    elif len(bones.snake) > 1:
-        first_tile_left_pip = bones.snake[0][0]
-        last_tile_right_pip = bones.snake[-1][0]
-        pip_count = 0
-        if first_tile_left_pip == last_tile_right_pip:
-            for i in bones.snake:
-                for j in i:
-                    if j == first_tile_left_pip:
-                        pip_count += 1
-            if pip_count == 8:
-                current_status = game_status['draw_game']
-                return_status = 999
-
-    print(f"\nStatus: {current_status}")
-    return return_status
-
-
-def bust_a_move(player, move):
-    if move == 0:
-        if len(bones.stock_set) != 0:
-            tile = bones.stock_set.pop(random.randint(0, len(bones.stock_set) - 1))
-            if player == 'human':
-                bones.player_set.append(tile)
-            else:
-                bones.computer_set.append(tile)
-    else:
-        tile_choice = abs(move) - 1
-        if player == 'human':
-            tile = bones.player_set.pop(tile_choice)
-        else:
-            tile = bones.computer_set.pop(tile_choice)
-        if move < 0:
-            bones.snake.insert(0, tile)
-        else:
-            bones.snake.append(tile)
-    return "Valid"
-
-
-def shall_we_play_a_game():
-    player_list = build_player_list(bones)
-    current_player = player_list[0]
-    game_state = "In Progress"
-
-    while game_state == "In Progress":
-        player_size = len(bones.player_set)
-        display_current_playing_field()
-        check_status = check_game_status(current_player)
-        if check_status == 111:
-            move_status = "Invalid"
-            player_move = 999
-            while move_status == "Invalid":
-                try:
-                    player_move = int(input())
-                    if abs(player_move) < 0 or abs(player_move) > player_size:
-                        raise ValueError
-                    move_status = "Valid"
-                except ValueError:
-                    print("Invalid input. Please try again.")
-            busted = bust_a_move(current_player, player_move)
-            if busted == "Invalid":
-                print("Illegal move. Please try again..")
-                continue
-            current_player = 'computer'
-            continue
-        if check_status == 222:
-            input()
-            if len(bones.computer_set) > 1:
-                computer_move = random.randint(-(len(bones.computer_set) - 1), len(bones.computer_set) - 1)
-            else:
-                computer_move = random.randint(-1, 1)
-            bust_a_move(current_player, computer_move)
-            current_player = 'human'
-            continue
-        game_state = "Game Over"
-
-
 if __name__ == "__main__":
+    # region Construct domino set and deal out tiles to players
     bones: DominoSet = DominoSet()
     bones.deal_pieces()
+    # endregion
+
+    # region Game Functions
+    def build_player_list():
+
+        players: list[str] = []
+        if len(bones.player_set) > len(bones.computer_set):
+            players.append("human")
+            players.append("computer")
+        else:
+            players.append("computer")
+            players.append("human")
+        return players
+
+
+    def display_current_playing_field():
+        stock_count = len(bones.stock_set)
+        computer_count = len(bones.computer_set)
+        print('=' * 70)
+        print(f"Stock size: {stock_count}")
+        print(f"Computer pieces: {computer_count}\n")
+
+        if len(bones.snake) > 6:
+            print(bones.snake[0], end='')
+            print(bones.snake[1], end='')
+            print(bones.snake[2], end='...')
+            print(bones.snake[-3], end='')
+            print(bones.snake[-2], end='')
+            print(bones.snake[-1], end='')
+        else:
+            for tile in bones.snake:
+                print(tile, end='')
+        print("\n\nYour pieces:")
+        for i, piece in enumerate(bones.player_set):
+            print(f'{i + 1}:{piece}')
+
+
+    def check_game_status(player):
+        game_status = {'player_turn': "It's your turn to make a move. Enter your command.",
+                       'computer_turn': "Computer is about to make a move. Press Enter to continue...",
+                       'player_won': "The game is over. You won!",
+                       'computer_won': "The game is over. The computer won!",
+                       'draw_game': "The game is over. It's a draw!"}
+
+        if player == 'human':
+            current_status = game_status['player_turn']
+            return_status = 111
+        else:
+            current_status = game_status['computer_turn']
+            return_status = 222
+
+        if player == 'human' and len(bones.computer_set) == 0:
+            current_status = game_status['computer_won']
+            return_status = 999
+        elif player == 'computer' and len(bones.player_set) == 0:
+            current_status = game_status['player_won']
+            return_status = 999
+        elif len(bones.snake) > 1:
+            first_tile_left_pip = bones.snake[0][0]
+            last_tile_right_pip = bones.snake[-1][1]
+            pip_count = 0
+            if first_tile_left_pip == last_tile_right_pip:
+                for i in bones.snake:
+                    for j in i:
+                        if j == first_tile_left_pip:
+                            pip_count += 1
+                if pip_count == 8:
+                    current_status = game_status['draw_game']
+                    return_status = 999
+
+        print(f"\nStatus: {current_status}")
+        return return_status
+
+
+    def validate_move(player, move):
+        tile_choice = abs(move) - 1
+        if move == 0:
+            return "Valid"
+        if player == 'human':
+            tile = bones.player_set[tile_choice]
+            if abs(move) > len(bones.player_set):
+                raise ValueError
+        if player == 'computer':
+            tile = bones.computer_set[tile_choice]
+        return "Valid"
+
+
+    def bust_a_move(player, move):
+        if move == 0:
+            if len(bones.stock_set) != 0:
+                tile = bones.stock_set.pop(random.randint(0, len(bones.stock_set) - 1))
+                if player == 'human':
+                    bones.player_set.append(tile)
+                else:
+                    bones.computer_set.append(tile)
+        else:
+            tile_choice = abs(move) - 1
+            if player == 'human':
+                tile = bones.player_set.pop(tile_choice)
+            else:
+                tile = bones.computer_set.pop(tile_choice)
+            if move < 0:
+                bones.snake.insert(0, tile)
+            else:
+                bones.snake.append(tile)
+
+
+    def shall_we_play_a_game():
+        player_list = build_player_list()
+        current_player = player_list[0]
+        game_state = "In Progress"
+
+        while game_state == "In Progress":
+            display_current_playing_field()
+            check_status = check_game_status(current_player)
+            player_move = 999
+            if check_status == 111:
+                move_status = "Invalid"
+
+                while move_status == "Invalid":
+                    try:
+                        player_move = int(input())
+                        move_status = validate_move(current_player, player_move)
+                    except ValueError:
+                        print("Invalid input. Please try again.")
+
+            if check_status == 222:
+                move_status = "Invalid"
+                input()
+                if len(bones.computer_set) > 1:
+                    player_move = (
+                        random.randint(-(len(bones.computer_set) - 1), len(bones.computer_set) - 1))
+                else:
+                    player_move = (
+                        random.randint(-1, 1))
+
+                while move_status == "Invalid":
+                    move_status = validate_move(current_player, player_move)
+
+            bust_a_move(current_player, player_move)
+            if current_player == 'human':
+                current_player = 'computer'
+            else:
+                current_player = 'human'
+
+            game_state = "Game Over"
+
+
+    # endregion
+
+    # region Game In Progress
     shall_we_play_a_game()
+    # endregion
     sys.exit(0)
