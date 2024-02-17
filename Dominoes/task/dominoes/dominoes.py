@@ -111,12 +111,10 @@ if __name__ == "__main__":
     bones: DominoSet = DominoSet()
     bones.deal_pieces()
 
-
     # endregion
 
     # region Game Functions
     def build_player_list():
-
         players: list[str] = []
         if len(bones.player_set) > len(bones.computer_set):
             players.append("human")
@@ -151,7 +149,8 @@ if __name__ == "__main__":
 
     def check_game_status(player):
         game_status = {'player_turn': "It's your turn to make a move. Enter your command.",
-                       'computer_turn': "Computer is about to make a move. Press Enter to continue...",
+                       'computer_turn':
+                           "Computer is about to make a move. Press Enter to continue...",
                        'player_won': "The game is over. You won!",
                        'computer_won': "The game is over. The computer won!",
                        'draw_game': "The game is over. It's a draw!"}
@@ -199,7 +198,8 @@ if __name__ == "__main__":
             if abs(move) > len(bones.player_set):
                 raise ValueError
 
-        tile = bones.player_set[tile_choice] if player == 'human' else bones.computer_set[tile_choice]
+        tile = bones.player_set[tile_choice] \
+            if player == 'human' else bones.computer_set[tile_choice]
 
         if move > 0:
             for pip in tile:
@@ -266,8 +266,8 @@ if __name__ == "__main__":
                 input()
 
                 while move_status == "Invalid":
-                    player_move = (
-                            random.randint(-(len(bones.computer_set)), len(bones.computer_set)))
+                    player_move = (random.randint(-(len(bones.computer_set)),
+                                                  len(bones.computer_set)))
                     move_status = validate_move(current_player, player_move)
             if check_status == 999:
                 break
