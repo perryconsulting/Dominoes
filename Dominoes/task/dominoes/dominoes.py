@@ -110,6 +110,8 @@ if __name__ == "__main__":
     # region Construct domino set and deal out tiles to players
     bones: DominoSet = DominoSet()
     bones.deal_pieces()
+
+
     # endregion
 
     # region Game Functions
@@ -169,7 +171,7 @@ if __name__ == "__main__":
             return_status = 999
         elif len(bones.snake) > 1:
             first_tile_left_pip = bones.snake[0][0]
-            last_tile_right_pip = bones.snake[-1][1]
+            last_tile_right_pip = bones.snake[-1][-1]
             pip_count = 0
             if first_tile_left_pip == last_tile_right_pip:
                 for i in bones.snake:
@@ -186,18 +188,35 @@ if __name__ == "__main__":
 
     def validate_move(player, move):
         tile_choice = abs(move) - 1
+        snake_first_pip = bones.snake[0][0]
+        snake_last_pip = bones.snake[-1][-1]
+        match = False
+
         if move == 0:
             return "Valid"
+
         if player == 'human':
-            tile = bones.player_set[tile_choice]
             if abs(move) > len(bones.player_set):
                 raise ValueError
-        if player == 'computer':
-            tile = bones.computer_set[tile_choice]
-        return "Valid"
+
+        tile = bones.player_set[tile_choice] if player == 'human' else bones.computer_set[tile_choice]
+
+        if move > 0:
+            for pip in tile:
+                if pip == snake_last_pip:
+                    match = True
+        if move < 0:
+            for pip in tile:
+                if pip == snake_first_pip:
+                    match = True
+
+        return "Valid" if match is True else "Invalid"
 
 
     def bust_a_move(player, move):
+        snake_first_pip = bones.snake[0][0]
+        snake_last_pip = bones.snake[-1][-1]
+
         if move == 0:
             if len(bones.stock_set) != 0:
                 tile = bones.stock_set.pop(random.randint(0, len(bones.stock_set) - 1))
@@ -212,8 +231,12 @@ if __name__ == "__main__":
             else:
                 tile = bones.computer_set.pop(tile_choice)
             if move < 0:
+                if tile[-1] != snake_first_pip:
+                    tile.reverse()
                 bones.snake.insert(0, tile)
             else:
+                if tile[0] != snake_last_pip:
+                    tile.reverse()
                 bones.snake.append(tile)
 
 
@@ -233,25 +256,23 @@ if __name__ == "__main__":
                     try:
                         player_move = int(input())
                         move_status = validate_move(current_player, player_move)
+                        if move_status == "Invalid":
+                            print("Illegal move. Please try again..")
                     except ValueError:
                         print("Invalid input. Please try again.")
 
             if check_status == 222:
                 move_status = "Invalid"
                 input()
-                if len(bones.computer_set) > 1:
-                    player_move = (
-                        random.randint(-(len(bones.computer_set) - 1), len(bones.computer_set) - 1))
-                else:
-                    player_move = (
-                        random.randint(-1, 1))
 
                 while move_status == "Invalid":
+                    player_move = (
+                            random.randint(-(len(bones.computer_set)), len(bones.computer_set)))
                     move_status = validate_move(current_player, player_move)
-
+            if check_status == 999:
+                break
             bust_a_move(current_player, player_move)
             current_player = 'computer' if current_player == 'human' else 'human'
-            game_state = "Game Over"
 
 
     # endregion
