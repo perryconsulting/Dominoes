@@ -250,11 +250,7 @@ if __name__ == "__main__":
                     move_status = validate_move(current_player, player_move)
 
             bust_a_move(current_player, player_move)
-            if current_player == 'human':
-                current_player = 'computer'
-            else:
-                current_player = 'human'
-
+            current_player = 'computer' if current_player == 'human' else 'human'
             game_state = "Game Over"
 
 
