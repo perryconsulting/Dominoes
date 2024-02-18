@@ -9,7 +9,6 @@ import sys
 
 class DominoSet:
     """
-
     A Domino Set
     """
     snake: list[list[int]]
@@ -49,7 +48,6 @@ class DominoSet:
     def deal_pieces(self):
         """
         Layout the board, distribute the full set into stock, computer, and player sets.
-
         """
         valid_deal: bool = False
 
@@ -115,6 +113,11 @@ if __name__ == "__main__":
 
     # region Game Functions
     def build_player_list():
+        """
+        The player list establishes player order by size of set
+        :rtype: list
+        :return: Players in order, based on who started the snake.
+        """
         players: list[str] = []
         if len(bones.player_set) > len(bones.computer_set):
             players.append("human")
@@ -126,6 +129,9 @@ if __name__ == "__main__":
 
 
     def display_current_playing_field():
+        """
+        Draw the current status of the board
+        """
         stock_count = len(bones.stock_set)
         computer_count = len(bones.computer_set)
         print('=' * 70)
@@ -148,6 +154,12 @@ if __name__ == "__main__":
 
 
     def check_game_status(player):
+        """
+        Determine the current player and whether a win/draw condition exists
+        :rtype: int
+        :param player: Pass in expected next player
+        :return: Status of the game (win/lose/draw) based on board condition
+        """
         game_status = {'player_turn': "It's your turn to make a move. Enter your command.",
                        'computer_turn':
                            "Computer is about to make a move. Press Enter to continue...",
@@ -186,6 +198,15 @@ if __name__ == "__main__":
 
 
     def validate_move(player, move):
+        """
+        Validate the proposed move to check for int type and
+        whether the proposed move matches available moves
+        on the board.
+        :rtype: str
+        :param player:
+        :param move:
+        :return: Whether the proposed move is valid.
+        """
         tile_choice = abs(move) - 1
         snake_first_pip = bones.snake[0][0]
         snake_last_pip = bones.snake[-1][-1]
@@ -214,6 +235,12 @@ if __name__ == "__main__":
 
 
     def bust_a_move(player, move):
+        """
+        Apply the proposed move to the board and adjust the
+        player's tiles accordingly.
+        :param player:
+        :param move:
+        """
         snake_first_pip = bones.snake[0][0]
         snake_last_pip = bones.snake[-1][-1]
 
@@ -241,6 +268,9 @@ if __name__ == "__main__":
 
 
     def shall_we_play_a_game():
+        """
+        Main game logic.
+        """
         player_list = build_player_list()
         current_player = player_list[0]
         game_state = "In Progress"
@@ -249,6 +279,7 @@ if __name__ == "__main__":
             display_current_playing_field()
             check_status = check_game_status(current_player)
             player_move = 999
+            # region Human player move logic
             if check_status == 111:
                 move_status = "Invalid"
 
@@ -260,7 +291,8 @@ if __name__ == "__main__":
                             print("Illegal move. Please try again..")
                     except ValueError:
                         print("Invalid input. Please try again.")
-
+            # endregion
+            # region Computer player move logic
             if check_status == 222:
                 move_status = "Invalid"
                 input()
@@ -269,7 +301,8 @@ if __name__ == "__main__":
                     player_move = (random.randint(-(len(bones.computer_set)),
                                                   len(bones.computer_set)))
                     move_status = validate_move(current_player, player_move)
-            if check_status == 999:
+            # endregion
+            if check_status == 999:  # End game condition exists
                 break
             bust_a_move(current_player, player_move)
             current_player = 'computer' if current_player == 'human' else 'human'
