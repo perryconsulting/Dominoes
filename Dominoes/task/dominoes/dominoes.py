@@ -267,6 +267,11 @@ if __name__ == "__main__":
                 bones.snake.append(tile)
 
 
+    def generate_current_pip_value():
+        pip_values = []
+        return pip_values
+
+
     def shall_we_play_a_game():
         """
         Main game logic.
@@ -298,8 +303,14 @@ if __name__ == "__main__":
                 input()
 
                 while move_status == "Invalid":
-                    player_move = (random.randint(-(len(bones.computer_set)),
-                                                  len(bones.computer_set)))
+                    # Original random number generator
+                    # player_move = (random.randint(-(len(bones.computer_set)),
+                    #                               len(bones.computer_set)))
+                    #
+                    # TODO Replace random number generator with statistical analysis
+                    # region Statistical Analysis
+                    pip_count = generate_current_pip_value()
+                    # endregion
                     move_status = validate_move(current_player, player_move)
             # endregion
             if check_status == 999:  # End game condition exists
