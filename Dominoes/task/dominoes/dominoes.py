@@ -267,9 +267,40 @@ if __name__ == "__main__":
                 bones.snake.append(tile)
 
 
-    def generate_current_pip_value():
-        pip_values = []
-        return pip_values
+    def generate_current_pip_count():
+        """
+        Calculates the current pip count to determine rarity
+        :rtype: list
+        :return: List of pip counts in snake and computer set
+        """
+        pip_count = [0, 0, 0, 0, 0, 0, 0]
+        for i in bones.snake:
+            for j in i:
+                pip_count[j] += 1
+        for i in bones.computer_set:
+            for j in i:
+                pip_count[j] += 1
+        return pip_count
+
+
+    def calculate_computer_tile_value(pip_counts):
+        ranked_tiles = []
+        for i in range(len(bones.computer_set)):
+            pip_one = bones.computer_set[i][0]
+            pip_two = bones.computer_set[i][1]
+            tile_value = pip_counts[pip_one] + pip_counts[pip_two]
+            ranked_tiles.append(tile_value)
+        return ranked_tiles
+
+
+    def calculate_tile_ranks(tile_value):
+        ranked_tiles = [tile_value[0]]  # This is WRONG! Fix sort and store index in new list.
+        for i in range(len(tile_value)):
+            if tile_value[i] > ranked_tiles[i]:
+                ranked_tiles.insert(i, tile_value[i])
+            else:
+                ranked_tiles.append(tile_value[i])
+
 
 
     def shall_we_play_a_game():
@@ -302,16 +333,19 @@ if __name__ == "__main__":
                 move_status = "Invalid"
                 input()
 
+                # region Statistical Analysis
+                pip_count = generate_current_pip_count()
+                tile_values = calculate_computer_tile_value(pip_count)
+                preferred_tiles = calculate_tile_ranks(tile_values)
+                # endregion
+
                 while move_status == "Invalid":
                     # Original random number generator
                     # player_move = (random.randint(-(len(bones.computer_set)),
                     #                               len(bones.computer_set)))
-                    #
-                    # TODO Replace random number generator with statistical analysis
-                    # region Statistical Analysis
-                    pip_count = generate_current_pip_value()
-                    # endregion
+
                     move_status = validate_move(current_player, player_move)
+
             # endregion
             if check_status == 999:  # End game condition exists
                 break
