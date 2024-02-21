@@ -108,8 +108,6 @@ if __name__ == "__main__":
     # region Construct domino set and deal out tiles to players
     bones: DominoSet = DominoSet()
     bones.deal_pieces()
-
-
     # endregion
 
     # region Game Functions
@@ -272,7 +270,7 @@ if __name__ == "__main__":
         """
         Calculates the current pip count to determine rarity
         :rtype: list
-        :return: List of pip counts in snake and computer set
+        :return: Count of pip counts in snake and computer set
         """
         pip_count = [0, 0, 0, 0, 0, 0, 0]
         for i in bones.snake:
@@ -285,6 +283,12 @@ if __name__ == "__main__":
 
 
     def calculate_computer_tile_value(pip_counts):
+        """
+
+        :param pip_counts:
+        :return: Value of each tile
+        :rtype: list
+        """
         ranked_tiles = []
         for i in range(len(bones.computer_set)):
             pip_one = bones.computer_set[i][0]
@@ -295,6 +299,10 @@ if __name__ == "__main__":
 
 
     def sort_computer_tiles_by_value(tile_value):
+        """
+        Sorts the computer tiles by calculated value
+        :param tile_value:
+        """
         tile_value, bones.computer_set = (list(t) for t in zip(
             *sorted(zip(tile_value, bones.computer_set), reverse=True)))
 
