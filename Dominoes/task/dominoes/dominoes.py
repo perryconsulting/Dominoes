@@ -109,6 +109,7 @@ if __name__ == "__main__":
     bones: DominoSet = DominoSet()
     bones.deal_pieces()
 
+
     # endregion
 
     # region Game Functions
@@ -293,14 +294,9 @@ if __name__ == "__main__":
         return ranked_tiles
 
 
-    def calculate_tile_ranks(tile_value):
-        ranked_tiles = [tile_value[0]]  # This is WRONG! Fix sort and store index in new list.
-        for i in range(len(tile_value)):
-            if tile_value[i] > ranked_tiles[i]:
-                ranked_tiles.insert(i, tile_value[i])
-            else:
-                ranked_tiles.append(tile_value[i])
-
+    def sort_computer_tiles_by_value(tile_value):
+        tile_value, bones.computer_set = (list(t) for t in zip(
+            *sorted(zip(tile_value, bones.computer_set), reverse=True)))
 
 
     def shall_we_play_a_game():
@@ -336,15 +332,26 @@ if __name__ == "__main__":
                 # region Statistical Analysis
                 pip_count = generate_current_pip_count()
                 tile_values = calculate_computer_tile_value(pip_count)
-                preferred_tiles = calculate_tile_ranks(tile_values)
+                sort_computer_tiles_by_value(tile_values)
                 # endregion
 
+                current_tile = 1
+                try_count = 0
                 while move_status == "Invalid":
                     # Original random number generator
                     # player_move = (random.randint(-(len(bones.computer_set)),
                     #                               len(bones.computer_set)))
-
+                    if current_tile > len(bones.computer_set) - 1:
+                        player_move = 0
+                    else:
+                        if try_count % 2 == 0:
+                            player_move = current_tile
+                        else:
+                            player_move = -current_tile
                     move_status = validate_move(current_player, player_move)
+                    try_count += 1
+                    if try_count > 0 and try_count % 2 == 0:
+                        current_tile += 1
 
             # endregion
             if check_status == 999:  # End game condition exists
